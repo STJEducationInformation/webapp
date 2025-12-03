@@ -1,0 +1,39 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>ใบขอซื้อ</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="p-3">
+
+<div id="content"></div>
+
+<script>
+const urlParams = new URLSearchParams(location.search);
+const index = urlParams.get("index");
+
+fetch("WEB_APP_URL?action=listRequests&sheetId=19HF10SiHNtUyT9ikq5TriUJO6KkK_y7OTS12W-2Xmck")
+  .then(r=>r.json())
+  .then(j=>{
+    const r = j.data[index];
+
+    document.getElementById("content").innerHTML = `
+      <h3>ใบขอซื้อ</h3>
+      <p><b>ชื่อผู้ขอ:</b> ${r.fullname}</p>
+      <p><b>รายการ:</b> ${r.itemName}</p>
+      <p><b>จำนวน:</b> ${r.quantity}</p>
+
+      <h5>ไฟล์แนบ</h5>
+      <ul>
+        <li><a href="${r.spec}" target="_blank">📄 สเปค</a></li>
+        <li><a href="${r.quoteMin}" target="_blank">💰 ใบเสนอราคา</a></li>
+        <li><a href="${r.quote1}" target="_blank">📑 คู่เทียบ 1</a></li>
+        <li><a href="${r.quote2}" target="_blank">📑 คู่เทียบ 2</a></li>
+      </ul>
+    `;
+  });
+</script>
+
+</body>
+</html>

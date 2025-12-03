@@ -10,58 +10,177 @@
 <style>
   .file-icons a { font-size: 24px; text-decoration: none; }
   .file-icons a:hover { opacity: 0.7; }
+  small.text-muted { font-size: 0.8rem; }
 </style>
-
 </head>
 <body class="p-4">
 
 <h2>ระบบขออนุมัติจัดซื้อครุภัณฑ์</h2>
 <hr>
 
-<!-- แสดงสถานะ -->
-<div id="status"></div>
-
-<!-- ฟอร์มส่งคำขอ -->
 <form id="reqForm" enctype="multipart/form-data">
-
-  <input type="hidden" name="action" value="uploadRequest">
   <input type="hidden" name="sheetId" value="19HF10SiHNtUyT9ikq5TriUJO6KkK_y7OTS12W-2Xmck">
 
   <div class="row g-3">
-    
-    <div class="col-md-4">
-      <label class="form-label">ชื่อผู้ขอ</label>
-      <input type="text" name="fullname" class="form-control" required>
+
+    <!-- วันที่ + E-mail -->
+    <div class="col-md-3">
+      <label class="form-label">วันที่</label>
+      <input type="date" name="date" class="form-control">
+    </div>
+    <div class="col-md-3">
+      <label class="form-label">E-mail</label>
+      <input type="email" name="email" class="form-control" required>
     </div>
 
-    <div class="col-md-4">
-      <label class="form-label">รายการครุภัณฑ์</label>
+    <!-- ชื่อ-สกุล + ตำแหน่ง -->
+    <div class="col-md-3">
+      <label class="form-label">ชื่อ-สกุล</label>
+      <input type="text" name="fullname" class="form-control" required>
+    </div>
+    <div class="col-md-3">
+      <label class="form-label">ตำแหน่ง</label>
+      <input type="text" name="position" class="form-control" required>
+    </div>
+
+    <!-- ประเภท + หน่วยงาน -->
+    <div class="col-md-3">
+      <label class="form-label">ประเภทครุภัณฑ์</label>
+      <select name="type" class="form-select" required>
+        <option value="">-- เลือก --</option>
+        <option>ครุภัณฑ์ทางการแพทย์</option>
+        <option>ครุภัณฑ์ประกอบอาคาร</option>
+        <option>ครุภัณฑ์สิ่งก่อสร้าง</option>
+      </select>
+    </div>
+    <div class="col-md-3">
+      <label class="form-label">หน่วยงาน</label>
+      <select name="department" class="form-select" required>
+        <option value="">-- เลือก --</option>
+        <option>งานบริหารทั่วไป</option>
+        <option>งานการเงินและบัญชี</option>
+        <option>งานแผนและพัสดุ</option>
+        <option>งานโครงสร้างพื้นฐานและวิศวกรรมทางการแพทย์</option>
+        <option>งานการแพทย์เฉพาะทาง</option>
+        <option>งานเทคนิคการแพทย์</option>
+        <option>งานรังสีวิทยา</option>
+        <option>งานกายภาพบำบัด</option>
+        <option>ศูนย์บริการธาลัสซีเมีย</option>
+        <option>งานประกันสุขภาพ</option>
+        <option>งานเวชระเบียนและเวชสถิติ</option>
+        <option>งานพัฒนาคุณภาพบริการและมาตรฐาน</option>
+        <option>งานการพยาบาลผู้ป่วยนอก</option>
+        <option>งานการพยาบาลผู้ป่วยใน</option>
+        <option>งานการพยาบาลผู้ป่วยวิกฤต</option>
+        <option>งานการพยาบาลผู้ป่วยอุบัติเหตุและฉุกเฉิน</option>
+        <option>งานการพยาบาลห้องคลอด</option>
+        <option>งานการพยาบาลห้องผ่าตัด</option>
+        <option>งานการพยาบาลวิสัญญี</option>
+        <option>งานการพยาบาลด้านการควบคุมและป้องกันการติดเชื้อ</option>
+        <option>งานการพยาบาลคลินิกพิเศษ</option>
+        <option>งานปฐมภูมิและสร้างเสริมสุขภาพ</option>
+      </select>
+    </div>
+
+    <!-- ลำดับความสำคัญ + ลักษณะ -->
+    <div class="col-md-3">
+      <label class="form-label">ลำดับความสำคัญ</label>
+      <input type="number" name="priority" class="form-control" min="1" required>
+    </div>
+    <div class="col-md-3">
+      <label class="form-label">ลักษณะครุภัณฑ์</label>
+      <select name="nature" class="form-select" required>
+        <option value="">-- เลือก --</option>
+        <option>ครุภัณฑ์ทดแทน</option>
+        <option>ครุภัณฑ์เพิ่มประสิทธิภาพ</option>
+      </select>
+    </div>
+
+    <!-- รหัส + ชื่อรายการ -->
+    <div class="col-md-3">
+      <label class="form-label">รหัสครุภัณฑ์</label>
+      <input type="text" name="code" class="form-control">
+    </div>
+    <div class="col-md-9">
+      <label class="form-label">ชื่อรายการครุภัณฑ์</label>
       <input type="text" name="itemName" class="form-control" required>
     </div>
 
-    <div class="col-md-4">
-      <label class="form-label">จำนวน</label>
-      <input type="number" name="quantity" class="form-control" required>
+    <!-- จำนวน + หน่วยนับ -->
+    <div class="col-md-3">
+      <label class="form-label">จำนวนครุภัณฑ์</label>
+      <input type="number" name="quantity" class="form-control" min="1" required>
+    </div>
+    <div class="col-md-3">
+      <label class="form-label">หน่วยนับ</label>
+      <input type="text" name="unit" class="form-control" required>
+      <small class="text-muted">หน่วยนับต้องเหมือนกันทุกใบเสนอราคา</small>
     </div>
 
+    <!-- ราคาครุภัณฑ์ + ราคาครุภัณฑ์ (รวม VAT) -->
+    <div class="col-md-3">
+      <label class="form-label">ราคาครุภัณฑ์</label>
+      <select name="priceType" class="form-select">
+        <option value="">-- เลือก --</option>
+        <option>ครุภัณฑ์ที่มีราคาต่อหน่วย 1 ล้านบาทขึ้นไป</option>
+        <option>ครุภัณฑ์ที่มีราคาต่อหน่วยต่ำกว่า 1 ล้านบาท</option>
+      </select>
+    </div>
+    <div class="col-md-3">
+      <label class="form-label">ราคาครุภัณฑ์ (รวม VAT)</label>
+      <input type="number" name="priceVat" class="form-control" min="10000" step="100" required>
+      <small class="text-muted">
+        ต้องเกิน 10,000 บาท และหลักร้อย/สิบ/หน่วย ต้องเป็น 0 เช่น 11,000
+      </small>
+    </div>
+
+    <!-- เหตุผล -->
+    <div class="col-12">
+      <label class="form-label">เหตุผล/ความจำเป็น</label>
+      <textarea name="reason" class="form-control" rows="3" minlength="20" maxlength="500" required></textarea>
+      <small class="text-muted">
+        กรุณากรอกอย่างน้อย 20 ตัวอักษร และไม่เกิน 500 ตัวอักษร
+      </small>
+    </div>
+
+    <!-- ไฟล์แนบ -->
     <div class="col-md-6">
-      <label class="form-label">ไฟล์สเปค (Word)</label>
+      <label class="form-label">ไฟล์สเปค/คุณลักษณะเฉพาะ (Word .doc/.docx)</label>
       <input type="file" name="specFile" accept=".doc,.docx" class="form-control" required>
+      <small class="text-muted">
+        ห้ามระบุยี่ห้อ / รุ่น / เงื่อนไขที่ทำให้ล็อคสเปค
+      </small>
     </div>
 
     <div class="col-md-6">
-      <label class="form-label">ใบเสนอราคา (PDF)</label>
+      <label class="form-label">ใบเสนอราคา (PDF ราคาต่ำสุด)</label>
       <input type="file" name="quoteMin" accept="application/pdf" class="form-control" required>
+      <small class="text-muted">
+        หากมีผู้จำหน่ายรายเดียว ต้องแนบใบรับรองผู้จำหน่ายแทนใบคู่เทียบ 1 และ 2
+      </small>
     </div>
 
     <div class="col-md-6">
-      <label class="form-label">คู่เทียบ 1 (PDF)</label>
+      <label class="form-label">ใบเสนอราคาคู่เทียบลำดับที่ 1 (PDF)</label>
       <input type="file" name="quote1" accept="application/pdf" class="form-control">
     </div>
+    <div class="col-md-3">
+      <label class="form-label">ราคา คู่เทียบลำดับที่ 1</label>
+      <input type="number" name="quote1Price" class="form-control" min="0" step="100">
+    </div>
 
     <div class="col-md-6">
-      <label class="form-label">คู่เทียบ 2 (PDF)</label>
+      <label class="form-label">ใบเสนอราคาคู่เทียบลำดับที่ 2 (PDF)</label>
       <input type="file" name="quote2" accept="application/pdf" class="form-control">
+    </div>
+    <div class="col-md-3">
+      <label class="form-label">ราคา คู่เทียบลำดับที่ 2</label>
+      <input type="number" name="quote2Price" class="form-control" min="0" step="100">
+    </div>
+
+    <div class="col-md-6">
+      <label class="form-label">รูปภาพประกอบ (PDF หรือ รูปภาพ)</label>
+      <input type="file" name="imageFile" accept="application/pdf,image/*" class="form-control">
     </div>
 
   </div>
@@ -76,29 +195,12 @@
 
 <hr>
 
-<!-- ปุ่ม Admin -->
 <div class="d-flex justify-content-end">
   <button class="btn btn-dark" id="adminBtn">สำหรับเจ้าหน้าที่</button>
 </div>
 
-
-<!-- Modal ดูไฟล์ -->
-<div class="modal fade" id="fileModal">
-  <div class="modal-dialog modal-lg">
-    <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title">ไฟล์แนบ</h5>
-          <button class="btn-close" data-bs-dismiss="modal"></button>
-        </div>
-        <div class="modal-body" id="fileModalBody"></div>
-    </div>
-  </div>
-</div>
-
-
 <script>
-const API = "https://script.google.com/macros/s/AKfycbztkOFDCGLsW1Albzxn1nshbs_UnqzZaL1G5LiWD-vF2zmpglAhmBCpjjXVBjJYA4BtZw/exec";
-
+const API = "https://script.google.com/macros/s/AKfycbxP7K2YVj602t3PPZ7yAsuo94rlKxprbEtDRxwm1nxLf0ZvTmG13QzYBRCzgNjGsDiBWw/exec";
 
 /*********** ฟังก์ชันอ่านไฟล์เป็น Base64 ***********/
 function encodeFile(file) {
@@ -109,7 +211,6 @@ function encodeFile(file) {
   });
 }
 
-
 /*********** ส่งฟอร์มแบบ POST ***********/
 document.getElementById("reqForm").addEventListener("submit", async (e) => {
   e.preventDefault();
@@ -117,9 +218,16 @@ document.getElementById("reqForm").addEventListener("submit", async (e) => {
   const form = e.target;
   const formData = new FormData(form);
 
+  // ตรวจเหตุผลอย่างน้อย 20 ตัวอักษร
+  const reason = form.reason.value.trim();
+  if (reason.length < 20) {
+    Swal.fire("กรุณากรอกเหตุผล", "ต้องไม่น้อยกว่า 20 ตัวอักษร", "warning");
+    return;
+  }
+
   // แปลงไฟล์แนบ → Base64
-  for (let field of ["specFile", "quoteMin", "quote1", "quote2"]) {
-    let file = form[field].files[0];
+  for (let field of ["specFile", "quoteMin", "quote1", "quote2", "imageFile"]) {
+    let file = form[field]?.files[0];
     if (file) {
       const base64 = await encodeFile(file);
       formData.set(field, base64);
@@ -142,8 +250,6 @@ document.getElementById("reqForm").addEventListener("submit", async (e) => {
     Swal.fire("ผิดพลาด", json.message, "error");
   }
 });
-
-
 
 /*********** โหลดรายการคำขอ ***********/
 async function loadRequests() {
@@ -191,9 +297,7 @@ function showTable(rows) {
 
 loadRequests();
 
-
-
-/*********** Admin Login ***********/
+/*********** Admin Login (เหมือนเดิมของคุณ) ***********/
 document.getElementById("adminBtn").onclick = async () => {
   const { value: login } = await Swal.fire({
     title: "เข้าสู่ระบบเจ้าหน้าที่",
@@ -217,10 +321,7 @@ document.getElementById("adminBtn").onclick = async () => {
   }
 };
 
-
-/*********** Admin Panel ***********/
 async function adminPanel() {
-
   const url = API + "?action=listRequests&sheetId=19HF10SiHNtUyT9ikq5TriUJO6KkK_y7OTS12W-2Xmck";
   const res = await fetch(url);
   const json = await res.json();
@@ -269,6 +370,5 @@ async function adminPanel() {
 </script>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-
 </body>
 </html>

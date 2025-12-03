@@ -267,6 +267,8 @@ function showTable(rows) {
         <th>ชื่อ</th>
         <th>รายการ</th>
         <th>จำนวน</th>
+        <th>สถานะ</th>
+        <th>หมายเหตุ</th>
         <th>ไฟล์แนบ</th>
       </tr>
     </thead>
@@ -279,6 +281,8 @@ function showTable(rows) {
         <td>${r.fullname}</td>
         <td>${r.itemName}</td>
         <td>${r.quantity}</td>
+        <td>${r.status || ""}</td>
+        <td>${r.note || ""}</td>
         <td>
           <span class="file-icons d-flex gap-2">
             <a href="${r.spec}" target="_blank" title="สเปค">📄</a>
@@ -294,6 +298,7 @@ function showTable(rows) {
   html += "</tbody></table>";
   document.getElementById("requestTable").innerHTML = html;
 }
+
 
 loadRequests();
 
@@ -330,9 +335,9 @@ async function adminPanel() {
   <table class="table table-bordered">
     <thead>
       <tr>
-        <th>#</th>
-        <th>ชื่อ</th>
-        <th>รายการ</th>
+        <th>ลำดับ</th>
+        <th>ผู้ขออนุมัติ</th>
+        <th>ชื่อรายการครุภัณฑ์</th>
         <th>สถานะ</th>
         <th>ไฟล์แนบ</th>
       </tr>

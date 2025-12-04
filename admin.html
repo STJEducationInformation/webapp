@@ -8,18 +8,20 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <style>
-  .file-icons a { font-size: 22px; text-decoration: none; }
+  .file-icons a { font-size: 20px; text-decoration: none; margin-right: 4px; }
   .file-icons a:hover { opacity: 0.7; }
+  .table-sm td, .table-sm th { padding: 0.35rem 0.5rem; }
 </style>
 </head>
 <body class="p-4">
 
-<h2>หน้าจัดการคำขอ (Admin)</h2>
+<h3 class="mb-3">หน้าจัดการคำขอจัดซื้อครุภัณฑ์ (Admin)</h3>
 <hr>
 
+<!-- กล่อง Login -->
 <div id="loginBox" class="mb-4">
   <h5>เข้าสู่ระบบเจ้าหน้าที่</h5>
-  <div class="row g-2">
+  <div class="row g-2 align-items-center">
     <div class="col-md-3">
       <input id="user" class="form-control" placeholder="Username">
     </div>
@@ -32,6 +34,7 @@
   </div>
 </div>
 
+<!-- ส่วนแสดงตาราง Admin -->
 <div id="adminPanel" style="display:none;">
   <div class="d-flex justify-content-between mb-2">
     <h5>รายการคำขอทั้งหมด</h5>
@@ -41,11 +44,12 @@
 </div>
 
 <script>
-const API = "https://script.google.com/macros/s/AKfycbw3yEQIsaAVChxIXyfdWOrzD_73kC3T6RBGJc-hj9c6JhHcNW22AlI98y5RmYnGIXnmgQ/exec";
+const API      = "https://script.google.com/macros/s/AKfycbw3yEQIsaAVChxIXyfdWOrzD_73kC3T6RBGJc-hj9c6JhHcNW22AlI98y5RmYnGIXnmgQ/exec";
 const SHEET_ID = "19HF10SiHNtUyT9ikq5TriUJO6KkK_y7OTS12W-2Xmck";
 
 let ADMIN_LOGGED_IN = false;
 
+/************ Login ************/
 function doLogin(){
   const u = document.getElementById("user").value.trim();
   const p = document.getElementById("pass").value.trim();
@@ -60,22 +64,25 @@ function doLogin(){
   }
 }
 
+/************ โหลดรายการทั้งหมด ************/
 async function loadAdminRequests(){
   const res = await fetch(API + "?action=listRequests&sheetId=" + SHEET_ID);
   const json = await res.json();
   renderAdminTable(json.data || []);
 }
 
+/************ แสดงตาราง ************/
 function renderAdminTable(rows){
   let html = `
   <table class="table table-bordered table-sm align-middle">
     <thead class="table-light">
       <tr>
-        <th>#</th>
+        <th>ลำดับ</th>
         <th>วันที่</th>
-        <th>ชื่อ</th>
-        <th>รายการ</th>
+        <th>ผู้ขออนุมัติ</th>
+        <th>ชื่อรายการครุภัณฑ์</th>
         <th>หน่วยงาน</th>
+        <th>จำนวน</th>
         <th>สถานะ</th>
         <th>หมายเหตุ</th>
         <th>ไฟล์แนบ</th>
@@ -94,22 +101,23 @@ function renderAdminTable(rows){
         <td>${r.fullname}</td>
         <td>${r.itemName}</td>
         <td>${r.department || ""}</td>
+        <td>${r.quantity} ${r.unit || ""}</td>
         <td>${r.status || ""}</td>
-        <td>${r.note || ""}</td>
+        <td style="max-width:200px;">${r.note || ""}</td>
         <td>
-          <span class="file-icons d-flex gap-2">
-            <a href="${r.spec}" target="_blank" title="สเปค">📄</a>
+          <span class="file-icons">
+            <a href="${r.spec}"     target="_blank" title="สเปค">📄</a>
             <a href="${r.quoteMin}" target="_blank" title="ใบเสนอราคา">💰</a>
-            <a href="${r.quote1}" target="_blank" title="คู่เทียบ 1">📑</a>
-            <a href="${r.quote2}" target="_blank" title="คู่เทียบ 2">📑</a>
+            <a href="${r.quote1}"   target="_blank" title="คู่เทียบ 1">📑</a>
+            <a href="${r.quote2}"   target="_blank" title="คู่เทียบ 2">📑</a>
           </span>
         </td>
         <td>
           <div class="btn-group btn-group-sm" role="group">
-            <button class="btn btn-success" onclick="approve(${idx})">อนุมัติ</button>
-            <button class="btn btn-warning" onclick="markEdit(${idx})">แก้ไข</button>
-            <button class="btn btn-danger" onclick="delRow(${idx})">ลบ</button>
-            <button class="btn btn-secondary" onclick="printOne(${idx})">พิมพ์</button>
+            <button class="btn btn-success"  onclick="approve(${idx})">อนุมัติ</button>
+            <button class="btn btn-warning"  onclick="markEdit(${idx})">แก้ไข</button>
+            <button class="btn btn-danger"   onclick="delRow(${idx})">ลบ</button>
+            <button class="btn btn-secondary"onclick="printOne(${idx})">พิมพ์</button>
           </div>
         </td>
       </tr>
@@ -120,6 +128,7 @@ function renderAdminTable(rows){
   document.getElementById("adminTable").innerHTML = html;
 }
 
+/************ เรียก adminAction ที่ backend ************/
 async function callAdminAction(index, sub, note=""){
   const params = new URLSearchParams({
     action: "adminAction",
@@ -129,8 +138,9 @@ async function callAdminAction(index, sub, note=""){
   });
   if (note) params.append("note", note);
 
-  const res = await fetch(API + "?" + params.toString());
+  const res  = await fetch(API + "?" + params.toString());
   const json = await res.json();
+
   if (!json.success) {
     Swal.fire("ผิดพลาด", json.message || "ดำเนินการไม่สำเร็จ", "error");
   } else {
@@ -138,6 +148,7 @@ async function callAdminAction(index, sub, note=""){
   }
 }
 
+/************ ปุ่มต่าง ๆ ************/
 function approve(index){
   Swal.fire({
     title: "ยืนยันอนุมัติ?",
@@ -146,9 +157,7 @@ function approve(index){
     confirmButtonText: "อนุมัติ",
     cancelButtonText: "ยกเลิก"
   }).then(r=>{
-    if (r.isConfirmed) {
-      callAdminAction(index, "approve");
-    }
+    if (r.isConfirmed) callAdminAction(index, "approve");
   });
 }
 
@@ -157,13 +166,12 @@ function markEdit(index){
     title: "ให้ผู้ขอแก้ไข / หมายเหตุ",
     input: "textarea",
     inputLabel: "ระบุสิ่งที่ต้องแก้ไข",
-    inputPlaceholder: "เช่น โปรดปรับราคาตามใบเสนอราคาใหม่...",
+    inputPlaceholder: "เช่น โปรดปรับข้อมูลใบเสนอราคาใหม่...",
+    inputAttributes: { 'aria-label': 'หมายเหตุ' },
     showCancelButton: true,
     confirmButtonText: "บันทึก"
   }).then(r=>{
-    if (r.isConfirmed) {
-      callAdminAction(index, "edit", r.value || "");
-    }
+    if (r.isConfirmed) callAdminAction(index, "edit", r.value || "");
   });
 }
 
@@ -176,9 +184,7 @@ function delRow(index){
     confirmButtonText: "ลบ",
     cancelButtonText: "ยกเลิก"
   }).then(r=>{
-    if (r.isConfirmed) {
-      callAdminAction(index, "delete");
-    }
+    if (r.isConfirmed) callAdminAction(index, "delete");
   });
 }
 

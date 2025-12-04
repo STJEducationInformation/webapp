@@ -1,67 +1,80 @@
-/* login.js */
-/* ส่วนนี้ใช้ในหน้าอื่นๆ เช่น dashboard.html, asset.html, admin.html */
-/* เพื่อบังคับตรวจสอบว่าผู้ใช้ login แล้วจริงหรือไม่ */
+// -------------------------------
+// Google Identity Services Login
+// -------------------------------
 
-const API_URL   = "https://script.google.com/macros/s/AKfycbzj0tobd-Vse97msrhIIh9Pfw3-qIKjSh9ikO5YKoApBh7f4-qxu7Ed0nRLsPNINWaIDw/exec";
+document.addEventListener("DOMContentLoaded", () => {
+    google.accounts.id.initialize({
+        client_id: "231419249990-lp98er5l1v0v4u9s1foqi8e6fob9rtgb.apps.googleusercontent.com",
+        callback: handleCredentialResponse
+    });
 
-/* ฟังก์ชันตรวจสอบการเข้าสู่ระบบ */
-function checkLogin() {
-  const email = localStorage.getItem("up_user_email");
-  const name  = localStorage.getItem("up_user_name");
-  const role  = localStorage.getItem("up_user_role");
+    google.accounts.id.renderButton(
+        document.getElementById("googleLoginBtn"),
+        {
+            theme: "filled_blue",
+            size: "large",
+            width: 260
+        }
+    );
 
-  // ถ้าไม่มี email แสดงว่ายังไม่ได้ login
-  if (!email || !role) {
-    window.location.href = "login.html";
-    return;
-  }
+    google.accounts.id.prompt(); 
+});
 
-  return { email, name, role };
+
+// -------------------------------------------
+// เมื่อ Login สำเร็จ (รับ JWT Token จาก Google)
+// -------------------------------------------
+function handleCredentialResponse(response) {
+    const jwt = response.credential;
+
+    // แปลง Payload ของ JWT token
+    const payload = JSON.parse(atob(jwt.split('.')[1]));
+
+    const email = payload.email;
+    const name  = payload.name;
+
+    // เก็บลง LocalStorage เพื่อให้หน้าอื่นเรียกใช้
+    localStorage.setItem("userEmail", email);
+    localStorage.setItem("userName", name);
+
+    // ไปเช็กสิทธิ์ role จาก Apps Script
+    getUserRoleFromServer(email, name);
 }
 
-/* ฟังก์ชันออกจากระบบ */
-function logout() {
-  localStorage.removeItem("up_user_email");
-  localStorage.removeItem("up_user_name");
-  localStorage.removeItem("up_user_role");
 
-  // Google Logout
-  try {
-    google.accounts.id.disableAutoSelect();
-  } catch (e) {}
+// -------------------------------------------
+// ดึงสิทธิ์ผู้ใช้จาก Apps Script (Admin/User/etc.)
+// -------------------------------------------
+async function getUserRoleFromServer(email, name) {
+    try {
+        const res = await fetch(
+            "https://script.google.com/macros/s/AKfycbzj0tobd-Vse97msrhIIh9Pfw3-qIKjSh9ikO5YKoApBh7f4-qxu7Ed0nRLsPNINWaIDw/exec",
+            {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    action: "getUserRole",
+                    email: email,
+                    name: name
+                })
+            }
+        );
 
-  window.location.href = "login.html";
-}
+        const result = await res.json();
 
-/* ฟังก์ชันตรวจสอบสิทธิ์ผู้ใช้จากหน้าอื่น */
-async function getUserRoleFromServer(email) {
-  const res = await fetch(API_URL, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      action: "getUserRole",
-      email: email
-    })
-  });
+        if (!result.success) {
+            alert("ไม่สามารถตรวจสอบสิทธิ์ผู้ใช้ได้");
+            return;
+        }
 
-  const data = await res.json();
-  return data;
-}
+        // เก็บ role ลง localStorage
+        localStorage.setItem("userRole", result.role);
 
-/* ฟังก์ชันป้องกันสิทธิ์เข้าหน้า Admin */
-function requireAdmin() {
-  const role = localStorage.getItem("up_user_role");
-  if (role !== "admin") {
-    alert("คุณไม่มีสิทธิ์เข้าหน้านี้");
-    window.location.href = "dashboard.html";
-  }
-}
+        // ไปหน้า index
+        window.location.href = "index.html";
 
-/* ฟังก์ชันป้องกันสิทธิ์เข้าหน้า Approver */
-function requireApprover() {
-  const role = localStorage.getItem("up_user_role");
-  if (role !== "approver" && role !== "admin") {
-    alert("คุณไม่มีสิทธิ์เข้าหน้านี้");
-    window.location.href = "dashboard.html";
-  }
+    } catch (err) {
+        console.error(err);
+        alert("เกิดข้อผิดพลาดในระบบ Login");
+    }
 }

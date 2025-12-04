@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>เข้าสู่ระบบ | UP Plan & Asset System</title>
+    <title>เข้าสู่ระบบ</title>
 
     <!-- Google Identity Services -->
     <script src="https://accounts.google.com/gsi/client" async defer></script>
@@ -19,7 +19,6 @@
             align-items: center;
             height: 100vh;
         }
-
         .login-box {
             width: 380px;
             padding: 40px 30px;
@@ -28,7 +27,6 @@
             box-shadow: 0 4px 14px rgba(0,0,0,0.1);
             text-align: center;
         }
-
         .logo {
             width: 72px;
             height: 72px;
@@ -42,22 +40,10 @@
             font-size: 32px;
             font-weight: bold;
         }
-
-        h2 {
-            margin-top: 0;
-            color: #1f2937;
-        }
-
         #googleLoginBtn {
-            margin-top: 24px;
+            margin-top: 25px;
             display: flex;
             justify-content: center;
-        }
-
-        .footer {
-            margin-top: 30px;
-            font-size: 13px;
-            color: #6b7280;
         }
     </style>
 </head>
@@ -68,18 +54,13 @@
         <div class="logo">UP</div>
 
         <h2>เข้าสู่ระบบ</h2>
-        <p style="color:#6b7280; margin-top:-10px;">
-            ระบบบริหารแผนและพัสดุ<br>โรงพยาบาลมหาวิทยาลัยพะเยา
-        </p>
+        <p>ระบบบริหารแผนและพัสดุ<br>โรงพยาบาลมหาวิทยาลัยพะเยา</p>
 
-        <!-- ปุ่ม Login -->
+        <!-- ปุ่ม Google Login -->
         <div id="googleLoginBtn"></div>
-
-        <div class="footer">
-            © ระบบแผนและพัสดุ ม.พะเยา
-        </div>
     </div>
 
+    <!-- โหลด login.js หลังจาก div -->
     <script src="login.js"></script>
 
 </body>

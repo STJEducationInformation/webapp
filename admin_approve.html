@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <title>อนุมัติคำขอครุภัณฑ์ | ระบบงานแผนและพัสดุ</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+  <script src="login.js"></script>
+  <script src="admin_approve.js" defer></script>
+
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background: #f3f4f6;
+      font-family: 'Kanit', sans-serif;
+    }
+
+    .topbar {
+      background: #ffffff;
+      padding: 16px 28px;
+      font-size: 20px;
+      font-weight: 600;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .back-btn {
+      font-size: 14px;
+      padding-left: 0;
+      cursor: pointer;
+      color: #4f46e5;
+      border: none;
+      background: none;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 24px auto;
+      padding: 20px;
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.07);
+      border: 1px solid #e5e7eb;
+    }
+
+    h2 {
+      margin-bottom: 18px;
+    }
+
+    /* Filter Bar */
+    .filter-bar {
+      display: flex;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+
+    .filter-bar select {
+      padding: 10px 14px;
+      border-radius: 10px;
+      border: 1px solid #d1d5db;
+      background: #f9fafb;
+      font-size: 14px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 12px;
+    }
+
+    table th, table td {
+      padding: 12px;
+      border: 1px solid #e5e7eb;
+      text-align: left;
+    }
+
+    table th {
+      background: #f3f4f6;
+    }
+
+    .approve-btn {
+      padding: 6px 12px;
+      background: #10b981;
+      color: white;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      margin-right: 4px;
+    }
+
+    .reject-btn {
+      padding: 6px 12px;
+      background: #ef4444;
+      color: white;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      margin-right: 4px;
+    }
+
+    .print-btn {
+      padding: 6px 12px;
+      background: #4f46e5;
+      color: white;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+    }
+
+    .status {
+      font-weight: 600;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="topbar">
+    <button class="back-btn" onclick="window.location.href='index.html'">← กลับ</button>
+    <div>ระบบอนุมัติคำขอครุภัณฑ์</div>
+    <div style="width:80px;"></div>
+  </div>
+
+  <div class="container">
+
+    <h2>รายการคำขอทั้งหมด</h2>
+
+    <div class="filter-bar">
+      <select id="filterStatus">
+        <option value="all">ทั้งหมด</option>
+        <option value="รอตรวจสอบ">รอตรวจสอบ</option>
+        <option value="อนุมัติ">อนุมัติ</option>
+        <option value="ไม่อนุมัติ">ไม่อนุมัติ</option>
+      </select>
+    </div>
+
+    <table>
+      <thead>
+        <tr>
+          <th>วันที่</th>
+          <th>ชื่อรายการ</th>
+          <th>ผู้ขอ</th>
+          <th>ราคา (รวม VAT)</th>
+          <th>สถานะ</th>
+          <th>จัดการ</th>
+        </tr>
+      </thead>
+      <tbody id="approveTable"></tbody>
+    </table>
+
+  </div>
+
+</body>
+</html>

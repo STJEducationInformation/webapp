@@ -1,274 +1,142 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
-<meta charset="UTF-8">
-<title>ระบบขออนุมัติจัดซื้อครุภัณฑ์</title>
+  <meta charset="UTF-8">
+  <title>หน้าแรก | ระบบงานแผนและพัสดุ</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
 
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600&display=swap" rel="stylesheet">
 
-<style>
-  .file-icons a { font-size: 24px; text-decoration: none; }
-  .file-icons a:hover { opacity: 0.7; }
-</style>
+  <script src="login.js"></script>
 
-</head>
-<body class="p-4">
-
-<h2>ระบบขออนุมัติจัดซื้อครุภัณฑ์</h2>
-<hr>
-
-<!-- แสดงสถานะ -->
-<div id="status"></div>
-
-<!-- ฟอร์มส่งคำขอ -->
-<form id="reqForm" enctype="multipart/form-data">
-
-  <input type="hidden" name="action" value="uploadRequest">
-  <input type="hidden" name="sheetId" value="19HF10SiHNtUyT9ikq5TriUJO6KkK_y7OTS12W-2Xmck">
-
-  <div class="row g-3">
-    
-    <div class="col-md-4">
-      <label class="form-label">ชื่อผู้ขอ</label>
-      <input type="text" name="fullname" class="form-control" required>
-    </div>
-
-    <div class="col-md-4">
-      <label class="form-label">รายการครุภัณฑ์</label>
-      <input type="text" name="itemName" class="form-control" required>
-    </div>
-
-    <div class="col-md-4">
-      <label class="form-label">จำนวน</label>
-      <input type="number" name="quantity" class="form-control" required>
-    </div>
-
-    <div class="col-md-6">
-      <label class="form-label">ไฟล์สเปค (Word)</label>
-      <input type="file" name="specFile" accept=".doc,.docx" class="form-control" required>
-    </div>
-
-    <div class="col-md-6">
-      <label class="form-label">ใบเสนอราคา (PDF)</label>
-      <input type="file" name="quoteMin" accept="application/pdf" class="form-control" required>
-    </div>
-
-    <div class="col-md-6">
-      <label class="form-label">คู่เทียบ 1 (PDF)</label>
-      <input type="file" name="quote1" accept="application/pdf" class="form-control">
-    </div>
-
-    <div class="col-md-6">
-      <label class="form-label">คู่เทียบ 2 (PDF)</label>
-      <input type="file" name="quote2" accept="application/pdf" class="form-control">
-    </div>
-
-  </div>
-
-  <button class="btn btn-primary mt-3" type="submit">ส่งคำขอ</button>
-</form>
-
-<hr class="my-4">
-
-<h4>รายการคำขอของคุณ</h4>
-<div id="requestTable"></div>
-
-<hr>
-
-<!-- ปุ่ม Admin -->
-<div class="d-flex justify-content-end">
-  <a href="admin.html" target="_blank" class="btn btn-dark">สำหรับเจ้าหน้าที่</a>
-</div>
-
-
-
-<!-- Modal ดูไฟล์ -->
-<div class="modal fade" id="fileModal">
-  <div class="modal-dialog modal-lg">
-    <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title">ไฟล์แนบ</h5>
-          <button class="btn-close" data-bs-dismiss="modal"></button>
-        </div>
-        <div class="modal-body" id="fileModalBody"></div>
-    </div>
-  </div>
-</div>
-
-
-<script>
-const API = "https://script.google.com/macros/s/AKfycbztkOFDCGLsW1Albzxn1nshbs_UnqzZaL1G5LiWD-vF2zmpglAhmBCpjjXVBjJYA4BtZw/exec";
-
-
-/*********** ฟังก์ชันอ่านไฟล์เป็น Base64 ***********/
-function encodeFile(file) {
-  return new Promise((resolve) => {
-    const reader = new FileReader();
-    reader.onload = () => resolve(reader.result.split(",")[1]);
-    reader.readAsDataURL(file);
-  });
-}
-
-
-/*********** ส่งฟอร์มแบบ POST ***********/
-document.getElementById("reqForm").addEventListener("submit", async (e) => {
-  e.preventDefault();
-
-  const form = e.target;
-  const formData = new FormData(form);
-
-  // แปลงไฟล์แนบ → Base64
-  for (let field of ["specFile", "quoteMin", "quote1", "quote2"]) {
-    let file = form[field].files[0];
-    if (file) {
-      const base64 = await encodeFile(file);
-      formData.set(field, base64);
-      formData.set(field + "_name", file.name);
-      formData.set(field + "_type", file.type);
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Kanit', sans-serif;
+      background: #f7f8fa;
+      color: #111827;
     }
-  }
 
-  Swal.fire({title:"กำลังบันทึก...", didOpen:()=>Swal.showLoading()});
+    .topbar {
+      width: 100%;
+      padding: 16px 26px;
+      background: white;
+      box-shadow: 0 4px 18px rgba(0,0,0,0.07);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
 
-  let res = await fetch(API, { method: "POST", body: formData });
-  let json = await res.json();
+    .top-title {
+      font-size: 20px;
+      font-weight: 600;
+    }
 
-  Swal.close();
+    .menu-container {
+      padding: 40px 20px;
+      max-width: 1080px;
+      margin: auto;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 22px;
+    }
 
-  if (json.success) {
-    Swal.fire("สำเร็จ", "บันทึกข้อมูลเรียบร้อย", "success");
-    loadRequests();
-  } else {
-    Swal.fire("ผิดพลาด", json.message, "error");
-  }
-});
+    .menu-card {
+      background: white;
+      padding: 28px 26px;
+      border-radius: 18px;
+      text-decoration: none;
+      color: #111827;
+      box-shadow: 0 8px 22px rgba(0,0,0,0.06);
+      transition: 0.15s ease;
+      border: 1px solid #e5e7eb;
+    }
 
+    .menu-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 14px 28px rgba(0,0,0,0.08);
+    }
 
+    .menu-title {
+      font-size: 18px;
+      margin-bottom: 8px;
+      font-weight: 600;
+    }
 
-/*********** โหลดรายการคำขอ ***********/
-async function loadRequests() {
-  const url = API + "?action=listRequests&sheetId=19HF10SiHNtUyT9ikq5TriUJO6KkK_y7OTS12W-2Xmck";
-  const res = await fetch(url);
-  const json = await res.json();
-  showTable(json.data);
-}
+    .menu-desc {
+      font-size: 14px;
+      color: #6b7280;
+    }
 
-function showTable(rows) {
-  let html = `
-  <table class="table table-bordered">
-    <thead>
-      <tr>
-        <th>ชื่อ</th>
-        <th>รายการ</th>
-        <th>จำนวน</th>
-        <th>ไฟล์แนบ</th>
-      </tr>
-    </thead>
-    <tbody>
-  `;
+    .logout-btn {
+      padding: 9px 18px;
+      background: #ef4444;
+      color: white;
+      border-radius: 10px;
+      border: none;
+      cursor: pointer;
+      font-size: 14px;
+      transition: 0.15s;
+    }
 
-  rows.forEach((r, idx) => {
-    html += `
-      <tr>
-        <td>${r.fullname}</td>
-        <td>${r.itemName}</td>
-        <td>${r.quantity}</td>
-        <td>
-          <span class="file-icons d-flex gap-2">
-            <a href="${r.spec}" target="_blank" title="สเปค">📄</a>
-            <a href="${r.quoteMin}" target="_blank" title="ใบเสนอราคา">💰</a>
-            <a href="${r.quote1}" target="_blank" title="คู่เทียบ 1">📑</a>
-            <a href="${r.quote2}" target="_blank" title="คู่เทียบ 2">📑</a>
-          </span>
-        </td>
-      </tr>
-    `;
-  });
+    .logout-btn:hover {
+      background: #dc2626;
+    }
+  </style>
+</head>
 
-  html += "</tbody></table>";
-  document.getElementById("requestTable").innerHTML = html;
-}
+<body>
 
-loadRequests();
+  <div class="topbar">
+    <div class="top-title">ระบบงานแผนและพัสดุ</div>
+    <div>
+      <span id="userName" style="margin-right: 14px; font-weight: 500;"></span>
+      <button class="logout-btn" onclick="logout()">ออกจากระบบ</button>
+    </div>
+  </div>
 
+  <div class="menu-container">
+    <a href="dashboard.html" class="menu-card">
+      <div class="menu-title">📊 Dashboard</div>
+      <div class="menu-desc">สรุปข้อมูลคำขอทั้งหมด</div>
+    </a>
 
+    <a href="asset.html" class="menu-card">
+      <div class="menu-title">📝 ขออนุมัติครุภัณฑ์</div>
+      <div class="menu-desc">ยื่นคำขอจัดซื้อครุภัณฑ์</div>
+    </a>
 
-/*********** Admin Login ***********/
-document.getElementById("adminBtn").onclick = async () => {
-  const { value: login } = await Swal.fire({
-    title: "เข้าสู่ระบบเจ้าหน้าที่",
-    html: `...`,
-    ...
-  });
+    <a href="new_asset.html" class="menu-card">
+      <div class="menu-title">✨ ครุภัณฑ์ใหม่ไม่เคยขอ</div>
+      <div class="menu-desc">ระบบสำหรับขอครุภัณฑ์ใหม่</div>
+    </a>
 
-  ...
+    <a id="approveMenu" href="admin_approve.html" class="menu-card" style="display:none;">
+      <div class="menu-title">✔️ อนุมัติคำขอ</div>
+      <div class="menu-desc">สำหรับผู้มีสิทธิ์อนุมัติ</div>
+    </a>
 
-  if (login.user === "admin1" && login.pass === "planuph334") {
-    Swal.fire("สำเร็จ", "เข้าสู่ระบบแล้ว", "success");
-    adminPanel();
-  } else {
-    Swal.fire("ผิดพลาด", "ข้อมูลไม่ถูกต้อง", "error");
-  }
-};
+    <a id="adminMenu" href="admin.html" class="menu-card" style="display:none;">
+      <div class="menu-title">🛠 จัดการสิทธิ์</div>
+      <div class="menu-desc">กำหนด Admin / Approver / User</div>
+    </a>
+  </div>
 
-async function adminPanel() {
-  // โหลดข้อมูล แล้วแสดงด้วย Swal.fire(...)
-}
+  <script>
+    // ตรวจสอบ login
+    const user = checkLogin();
+    document.getElementById("userName").innerText = user.name;
 
-
-
-/*********** Admin Panel ***********/
-async function adminPanel() {
-
-  const url = API + "?action=listRequests&sheetId=19HF10SiHNtUyT9ikq5TriUJO6KkK_y7OTS12W-2Xmck";
-  const res = await fetch(url);
-  const json = await res.json();
-
-  let html = `
-  <table class="table table-bordered">
-    <thead>
-      <tr>
-        <th>#</th>
-        <th>ชื่อ</th>
-        <th>รายการ</th>
-        <th>สถานะ</th>
-        <th>ไฟล์แนบ</th>
-      </tr>
-    </thead>
-    <tbody>
-  `;
-
-  json.data.forEach((r, idx) => {
-    html += `
-      <tr>
-        <td>${idx}</td>
-        <td>${r.fullname}</td>
-        <td>${r.itemName}</td>
-        <td>${r.status}</td>
-        <td>
-          <span class="file-icons d-flex gap-2">
-            <a href="${r.spec}" target="_blank">📄</a>
-            <a href="${r.quoteMin}" target="_blank">💰</a>
-            <a href="${r.quote1}" target="_blank">📑</a>
-            <a href="${r.quote2}" target="_blank">📑</a>
-          </span>
-        </td>
-      </tr>
-    `;
-  });
-
-  html += "</tbody></table>";
-
-  Swal.fire({
-    title: "รายการคำขอทั้งหมด",
-    width: "900px",
-    html: html
-  });
-}
-</script>
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    // สิทธิ์ role
+    if (user.role === "admin") {
+      document.getElementById("adminMenu").style.display = "block";
+      document.getElementById("approveMenu").style.display = "block";
+    }
+    if (user.role === "approver") {
+      document.getElementById("approveMenu").style.display = "block";
+    }
+  </script>
 
 </body>
 </html>

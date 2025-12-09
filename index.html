@@ -1,142 +1,136 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
-  <meta charset="UTF-8">
-  <title>หน้าแรก | ระบบงานแผนและพัสดุ</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ระบบงานแผนและพัสดุ | หน้าหลัก</title>
 
-  <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600&display=swap" rel="stylesheet">
 
-  <script src="login.js"></script>
+    <style>
+        body {
+            font-family: "Kanit", sans-serif;
+            background: #f4f5f7;
+            margin: 0;
+            padding: 0;
+        }
 
-  <style>
-    body {
-      margin: 0;
-      padding: 0;
-      font-family: 'Kanit', sans-serif;
-      background: #f7f8fa;
-      color: #111827;
-    }
+        .navbar {
+            width: 100%;
+            background: white;
+            padding: 16px 30px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
 
-    .topbar {
-      width: 100%;
-      padding: 16px 26px;
-      background: white;
-      box-shadow: 0 4px 18px rgba(0,0,0,0.07);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
+        .navbar-title {
+            font-size: 20px;
+            color: #1f2937;
+            font-weight: 600;
+        }
 
-    .top-title {
-      font-size: 20px;
-      font-weight: 600;
-    }
+        .user-box {
+            font-size: 15px;
+            color: #374151;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
 
-    .menu-container {
-      padding: 40px 20px;
-      max-width: 1080px;
-      margin: auto;
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-      gap: 22px;
-    }
+        .logout-btn {
+            background: #dc2626;
+            color: white;
+            border: none;
+            padding: 6px 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+        }
 
-    .menu-card {
-      background: white;
-      padding: 28px 26px;
-      border-radius: 18px;
-      text-decoration: none;
-      color: #111827;
-      box-shadow: 0 8px 22px rgba(0,0,0,0.06);
-      transition: 0.15s ease;
-      border: 1px solid #e5e7eb;
-    }
+        .container {
+            max-width: 1200px;
+            margin: 60px auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+        }
 
-    .menu-card:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 14px 28px rgba(0,0,0,0.08);
-    }
+        .menu-card {
+            width: 260px;
+            background: white;
+            border-radius: 16px;
+            padding: 28px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease-in-out;
+        }
 
-    .menu-title {
-      font-size: 18px;
-      margin-bottom: 8px;
-      font-weight: 600;
-    }
+        .menu-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.16);
+        }
 
-    .menu-desc {
-      font-size: 14px;
-      color: #6b7280;
-    }
+        .menu-icon {
+            font-size: 40px;
+            margin-bottom: 12px;
+        }
 
-    .logout-btn {
-      padding: 9px 18px;
-      background: #ef4444;
-      color: white;
-      border-radius: 10px;
-      border: none;
-      cursor: pointer;
-      font-size: 14px;
-      transition: 0.15s;
-    }
+        .menu-title {
+            font-size: 20px;
+            font-weight: 600;
+        }
 
-    .logout-btn:hover {
-      background: #dc2626;
-    }
-  </style>
+        .menu-desc {
+            color: #6b7280;
+            font-size: 14px;
+            margin-top: 6px;
+        }
+    </style>
 </head>
 
-<body>
+<body onload="checkLogin()">
 
-  <div class="topbar">
-    <div class="top-title">ระบบงานแผนและพัสดุ</div>
-    <div>
-      <span id="userName" style="margin-right: 14px; font-weight: 500;"></span>
-      <button class="logout-btn" onclick="logout()">ออกจากระบบ</button>
+    <!-- แถบเมนูบน -->
+    <div class="navbar">
+        <div class="navbar-title">ระบบงานแผนและพัสดุ</div>
+
+        <div class="user-box">
+            <span id="userInfo">กำลังโหลด...</span>
+            <button class="logout-btn" onclick="logout()">ออกจากระบบ</button>
+        </div>
     </div>
-  </div>
 
-  <div class="menu-container">
-    <a href="dashboard.html" class="menu-card">
-      <div class="menu-title">📊 Dashboard</div>
-      <div class="menu-desc">สรุปข้อมูลคำขอทั้งหมด</div>
-    </a>
+    <!-- กล่องเมนูหลัก -->
+    <div class="container">
 
-    <a href="asset.html" class="menu-card">
-      <div class="menu-title">📝 ขออนุมัติครุภัณฑ์</div>
-      <div class="menu-desc">ยื่นคำขอจัดซื้อครุภัณฑ์</div>
-    </a>
+        <div class="menu-card" onclick="location.href='dashboard.html'">
+            <div class="menu-icon">📊</div>
+            <div class="menu-title">Dashboard</div>
+            <div class="menu-desc">สรุปข้อมูลคำขอทั้งหมด</div>
+        </div>
 
-    <a href="new_asset.html" class="menu-card">
-      <div class="menu-title">✨ ครุภัณฑ์ใหม่ไม่เคยขอ</div>
-      <div class="menu-desc">ระบบสำหรับขอครุภัณฑ์ใหม่</div>
-    </a>
+        <div class="menu-card" onclick="location.href='asset.html'">
+            <div class="menu-icon">📄</div>
+            <div class="menu-title">ขออนุมัติครุภัณฑ์</div>
+            <div class="menu-desc">ยื่นคำขอจัดซื้อครุภัณฑ์</div>
+        </div>
 
-    <a id="approveMenu" href="admin_approve.html" class="menu-card" style="display:none;">
-      <div class="menu-title">✔️ อนุมัติคำขอ</div>
-      <div class="menu-desc">สำหรับผู้มีสิทธิ์อนุมัติ</div>
-    </a>
+        <div class="menu-card" onclick="location.href='new_asset.html'">
+            <div class="menu-icon">✨</div>
+            <div class="menu-title">ครุภัณฑ์ใหม่</div>
+            <div class="menu-desc">ระบบยื่นขอครุภัณฑ์ที่ไม่เคยมีมาก่อน</div>
+        </div>
 
-    <a id="adminMenu" href="admin.html" class="menu-card" style="display:none;">
-      <div class="menu-title">🛠 จัดการสิทธิ์</div>
-      <div class="menu-desc">กำหนด Admin / Approver / User</div>
-    </a>
-  </div>
+    </div>
 
-  <script>
-    // ตรวจสอบ login
-    const user = checkLogin();
-    document.getElementById("userName").innerText = user.name;
-
-    // สิทธิ์ role
-    if (user.role === "admin") {
-      document.getElementById("adminMenu").style.display = "block";
-      document.getElementById("approveMenu").style.display = "block";
-    }
-    if (user.role === "approver") {
-      document.getElementById("approveMenu").style.display = "block";
-    }
-  </script>
+    <script src="index.js"></script>
 
 </body>
 </html>

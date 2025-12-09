@@ -1,136 +1,467 @@
 <!DOCTYPE html>
-<html lang="th">
-<head>
+<html>
+  <head>
+    <base target="_top">
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ระบบงานแผนและพัสดุ | หน้าหลัก</title>
+    <title>ตั้งค่า/บันทึกแผนงบประมาณ</title>
 
-    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <!-- Bootstrap CSS จาก CDN -->
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+      integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
+      crossorigin="anonymous"
+    >
 
     <style>
-        body {
-            font-family: "Kanit", sans-serif;
-            background: #f4f5f7;
-            margin: 0;
-            padding: 0;
-        }
+      body {
+        background-color: #f5f7fb;
+        font-family: "TH Sarabun New", system-ui, -apple-system, "Segoe UI", sans-serif;
+      }
 
-        .navbar {
-            width: 100%;
-            background: white;
-            padding: 16px 30px;
-            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            position: sticky;
-            top: 0;
-            z-index: 10;
-        }
+      .navbar {
+        background: linear-gradient(90deg, #003f7d, #005fa3);
+      }
 
-        .navbar-title {
-            font-size: 20px;
-            color: #1f2937;
-            font-weight: 600;
-        }
+      .navbar-brand, .nav-link, .navbar-text {
+        color: #fff !important;
+      }
 
-        .user-box {
-            font-size: 15px;
-            color: #374151;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
+      .page-title {
+        margin-top: 1.5rem;
+        margin-bottom: 1rem;
+      }
 
-        .logout-btn {
-            background: #dc2626;
-            color: white;
-            border: none;
-            padding: 6px 14px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 14px;
-        }
+      .card {
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        border-radius: 0.75rem;
+      }
 
-        .container {
-            max-width: 1200px;
-            margin: 60px auto;
-            padding: 0 20px;
-            display: flex;
-            justify-content: center;
-            gap: 40px;
-        }
+      .table thead {
+        background-color: #003f7d;
+        color: #fff;
+      }
 
-        .menu-card {
-            width: 260px;
-            background: white;
-            border-radius: 16px;
-            padding: 28px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.2s ease-in-out;
-        }
+      .required::after {
+        content: " *";
+        color: red;
+      }
 
-        .menu-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 8px 20px rgba(0,0,0,0.16);
-        }
-
-        .menu-icon {
-            font-size: 40px;
-            margin-bottom: 12px;
-        }
-
-        .menu-title {
-            font-size: 20px;
-            font-weight: 600;
-        }
-
-        .menu-desc {
-            color: #6b7280;
-            font-size: 14px;
-            margin-top: 6px;
-        }
+      #app-section {
+        display: none; /* เริ่มต้นยังไม่แสดง จนกว่าจะ Login */
+      }
     </style>
-</head>
+  </head>
 
-<body onload="checkLogin()">
-
-    <!-- แถบเมนูบน -->
-    <div class="navbar">
-        <div class="navbar-title">ระบบงานแผนและพัสดุ</div>
-
-        <div class="user-box">
-            <span id="userInfo">กำลังโหลด...</span>
-            <button class="logout-btn" onclick="logout()">ออกจากระบบ</button>
+  <body>
+    <!-- 🔵 Top Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+      <div class="container-fluid">
+        <span class="navbar-brand">
+          ระบบบันทึก/ตั้งค่าแผนงบประมาณ
+        </span>
+        <div class="ms-auto">
+          <span class="navbar-text me-3" id="currentUserLabel" style="display:none;">
+            ผู้ใช้: <span id="currentUserName"></span>
+          </span>
+          <button class="btn btn-outline-light btn-sm" id="btnLogout" style="display:none;">
+            ออกจากระบบ
+          </button>
         </div>
-    </div>
+      </div>
+    </nav>
 
-    <!-- กล่องเมนูหลัก -->
-    <div class="container">
+    <div class="container my-4">
 
-        <div class="menu-card" onclick="location.href='dashboard.html'">
-            <div class="menu-icon">📊</div>
-            <div class="menu-title">Dashboard</div>
-            <div class="menu-desc">สรุปข้อมูลคำขอทั้งหมด</div>
+      <!-- 🟡 Login Section -->
+      <div id="login-section" class="row justify-content-center">
+        <div class="col-md-5">
+          <div class="card">
+            <div class="card-header text-center">
+              <h5 class="mb-0">เข้าสู่ระบบ</h5>
+            </div>
+            <div class="card-body">
+              <form id="loginForm">
+                <div class="mb-3">
+                  <label class="form-label required">ชื่อผู้ใช้</label>
+                  <input type="text" class="form-control" id="loginUsername" required>
+                </div>
+                <div class="mb-3">
+                  <label class="form-label required">รหัสผ่าน</label>
+                  <input type="password" class="form-control" id="loginPassword" required>
+                </div>
+                <div class="d-grid">
+                  <button type="submit" class="btn btn-primary">
+                    เข้าสู่ระบบ
+                  </button>
+                </div>
+              </form>
+              <div class="mt-3 text-center text-muted" style="font-size:0.9rem;">
+                <div>ตัวอย่าง: admin / 1234 (แก้ได้ใน Code.gs)</div>
+              </div>
+              <div id="loginMessage" class="mt-3 text-center text-danger" style="display:none;"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 🟢 App Section (แสดงหลัง Login สำเร็จ) -->
+      <div id="app-section">
+        <!-- หัวข้อหน้า -->
+        <div class="page-title">
+          <h4>ตั้งค่า / บันทึกแผนงบประมาณ</h4>
+          <p class="text-muted mb-0">
+            จัดการข้อมูลปีงบประมาณ ประเภทงบประมาณ หน่วยงาน และวงเงิน
+          </p>
         </div>
 
-        <div class="menu-card" onclick="location.href='asset.html'">
-            <div class="menu-icon">📄</div>
-            <div class="menu-title">ขออนุมัติครุภัณฑ์</div>
-            <div class="menu-desc">ยื่นคำขอจัดซื้อครุภัณฑ์</div>
-        </div>
+        <div class="row">
+          <!-- แบบฟอร์ม -->
+          <div class="col-lg-4">
+            <div class="card mb-4">
+              <div class="card-header">
+                <h6 class="mb-0" id="formTitle">เพิ่มรายการงบประมาณ</h6>
+              </div>
+              <div class="card-body">
+                <form id="budgetForm">
+                  <!-- hidden id -->
+                  <input type="hidden" id="budgetId">
 
-        <div class="menu-card" onclick="location.href='new_asset.html'">
-            <div class="menu-icon">✨</div>
-            <div class="menu-title">ครุภัณฑ์ใหม่</div>
-            <div class="menu-desc">ระบบยื่นขอครุภัณฑ์ที่ไม่เคยมีมาก่อน</div>
-        </div>
+                  <div class="mb-3">
+                    <label class="form-label required">ปีงบประมาณ</label>
+                    <input type="text" class="form-control" id="fiscalYear" placeholder="เช่น 2568" required>
+                  </div>
 
-    </div>
+                  <div class="mb-3">
+                    <label class="form-label required">ประเภทงบประมาณ</label>
+                    <input type="text" class="form-control" id="budgetType" placeholder="เช่น งบลงทุน, งบดำเนินงาน" required>
+                  </div>
 
-    <script src="index.js"></script>
+                  <div class="mb-3">
+                    <label class="form-label required">หน่วยงาน</label>
+                    <input type="text" class="form-control" id="department" placeholder="เช่น งานแผนและพัสดุ" required>
+                  </div>
 
-</body>
+                  <div class="mb-3">
+                    <label class="form-label required">จำนวนเงิน (บาท)</label>
+                    <input type="number" class="form-control" id="amount" min="0" step="0.01" required>
+                  </div>
+
+                  <div class="mb-3">
+                    <label class="form-label">หมายเหตุ</label>
+                    <textarea class="form-control" id="remark" rows="2"></textarea>
+                  </div>
+
+                  <div class="d-grid gap-2">
+                    <button type="submit" class="btn btn-success" id="btnSave">
+                      บันทึก
+                    </button>
+                    <button type="button" class="btn btn-secondary" id="btnClear">
+                      ล้างฟอร์ม
+                    </button>
+                  </div>
+                </form>
+                <div id="formMessage" class="mt-3 text-center" style="display:none;"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ตาราง -->
+          <div class="col-lg-8">
+            <div class="card">
+              <div class="card-header d-flex justify-content-between align-items-center">
+                <h6 class="mb-0">รายการงบประมาณ</h6>
+                <small class="text-muted" id="recordCountLabel"></small>
+              </div>
+              <div class="card-body p-0">
+                <div class="table-responsive">
+                  <table class="table table-sm mb-0 align-middle">
+                    <thead>
+                      <tr class="text-center">
+                        <th style="width: 5%;">ID</th>
+                        <th style="width: 12%;">ปีงบ</th>
+                        <th style="width: 20%;">ประเภทงบฯ</th>
+                        <th style="width: 23%;">หน่วยงาน</th>
+                        <th style="width: 15%;">จำนวนเงิน</th>
+                        <th style="width: 10%;">แก้ไขล่าสุด</th>
+                        <th style="width: 15%;">จัดการ</th>
+                      </tr>
+                    </thead>
+                    <tbody id="budgetTableBody">
+                      <tr>
+                        <td colspan="7" class="text-center py-4 text-muted">
+                          กำลังโหลดข้อมูล...
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div><!-- /.row -->
+      </div><!-- /#app-section -->
+    </div><!-- /.container -->
+
+    <!-- Bootstrap JS (สำหรับ modal ฯลฯ ถ้าจะใช้ต่อ) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+      crossorigin="anonymous"></script>
+
+    <script>
+      let isLoggedIn = false;
+
+      // ✅ จัดการ Login
+      const loginForm = document.getElementById('loginForm');
+      const loginSection = document.getElementById('login-section');
+      const appSection = document.getElementById('app-section');
+      const loginMessage = document.getElementById('loginMessage');
+
+      const currentUserLabel = document.getElementById('currentUserLabel');
+      const currentUserName = document.getElementById('currentUserName');
+      const btnLogout = document.getElementById('btnLogout');
+
+      loginForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        const username = document.getElementById('loginUsername').value.trim();
+        const password = document.getElementById('loginPassword').value.trim();
+
+        loginMessage.style.display = 'none';
+        loginMessage.textContent = '';
+
+        google.script.run
+          .withSuccessHandler(function(res) {
+            if (res && res.success) {
+              isLoggedIn = true;
+
+              // แสดงชื่อผู้ใช้ด้านบน
+              currentUserName.textContent = username;
+              currentUserLabel.style.display = 'inline-block';
+              btnLogout.style.display = 'inline-block';
+
+              // ซ่อนหน้า login แสดงหน้า app
+              loginSection.style.display = 'none';
+              appSection.style.display = 'block';
+
+              // โหลดข้อมูลตาราง
+              loadBudgetTable();
+            } else {
+              loginMessage.textContent = (res && res.message) ? res.message : 'ไม่สามารถเข้าสู่ระบบได้';
+              loginMessage.style.display = 'block';
+            }
+          })
+          .withFailureHandler(function(err) {
+            loginMessage.textContent = 'เกิดข้อผิดพลาด: ' + err.message;
+            loginMessage.style.display = 'block';
+          })
+          .checkLogin(username, password);
+      });
+
+      // ✅ ออกจากระบบ (แค่ล้าง state ฝั่ง client)
+      btnLogout.addEventListener('click', function() {
+        isLoggedIn = false;
+        appSection.style.display = 'none';
+        loginSection.style.display = 'flex';
+        currentUserLabel.style.display = 'none';
+        btnLogout.style.display = 'none';
+        document.getElementById('loginForm').reset();
+      });
+
+      // ✅ โหลดตาราง
+      function loadBudgetTable() {
+        const tbody = document.getElementById('budgetTableBody');
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="7" class="text-center py-4 text-muted">
+              กำลังโหลดข้อมูล...
+            </td>
+          </tr>
+        `;
+
+        google.script.run
+          .withSuccessHandler(function(data) {
+            renderBudgetTable(data || []);
+          })
+          .withFailureHandler(function(err) {
+            tbody.innerHTML = `
+              <tr>
+                <td colspan="7" class="text-center py-4 text-danger">
+                  ไม่สามารถโหลดข้อมูลได้: ${err.message}
+                </td>
+              </tr>
+            `;
+          })
+          .getAllBudgets();
+      }
+
+      // ✅ แสดงผลตาราง
+      function renderBudgetTable(items) {
+        const tbody = document.getElementById('budgetTableBody');
+        const recordCountLabel = document.getElementById('recordCountLabel');
+
+        if (!items || items.length === 0) {
+          tbody.innerHTML = `
+            <tr>
+              <td colspan="7" class="text-center py-4 text-muted">
+                ยังไม่มีข้อมูลงบประมาณ
+              </td>
+            </tr>
+          `;
+          recordCountLabel.textContent = '0 รายการ';
+          return;
+        }
+
+        recordCountLabel.textContent = items.length + ' รายการ';
+
+        tbody.innerHTML = '';
+        items.forEach(function(item) {
+          const tr = document.createElement('tr');
+
+          const amountFormatted = Number(item.amount || 0).toLocaleString('th-TH', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+          });
+
+          let updatedText = '';
+          if (item.updatedAt && item.updatedAt.toString) {
+            updatedText = new Date(item.updatedAt).toLocaleDateString('th-TH');
+          }
+
+          tr.innerHTML = `
+            <td class="text-center">${item.id || ''}</td>
+            <td class="text-center">${item.fiscalYear || ''}</td>
+            <td>${item.budgetType || ''}</td>
+            <td>${item.department || ''}</td>
+            <td class="text-end">${amountFormatted}</td>
+            <td class="text-center">${updatedText}</td>
+            <td class="text-center">
+              <button class="btn btn-sm btn-outline-primary me-1" data-action="edit" data-id="${item.id}">
+                แก้ไข
+              </button>
+              <button class="btn btn-sm btn-outline-danger" data-action="delete" data-id="${item.id}">
+                ลบ
+              </button>
+            </td>
+          `;
+
+          tbody.appendChild(tr);
+        });
+
+        // ผูก event ปุ่ม แก้ไข/ลบ
+        tbody.querySelectorAll('button[data-action="edit"]').forEach(function(btn) {
+          btn.addEventListener('click', function() {
+            const id = this.getAttribute('data-id');
+            const item = items.find(x => String(x.id) === String(id));
+            if (item) {
+              fillFormForEdit(item);
+            }
+          });
+        });
+
+        tbody.querySelectorAll('button[data-action="delete"]').forEach(function(btn) {
+          btn.addEventListener('click', function() {
+            const id = this.getAttribute('data-id');
+            if (confirm('ต้องการลบรายการ ID ' + id + ' ใช่หรือไม่?')) {
+              deleteBudget(id);
+            }
+          });
+        });
+      }
+
+      // ✅ เติมฟอร์มเพื่อแก้ไข
+      function fillFormForEdit(item) {
+        document.getElementById('budgetId').value = item.id || '';
+        document.getElementById('fiscalYear').value = item.fiscalYear || '';
+        document.getElementById('budgetType').value = item.budgetType || '';
+        document.getElementById('department').value = item.department || '';
+        document.getElementById('amount').value = item.amount || '';
+        document.getElementById('remark').value = item.remark || '';
+
+        document.getElementById('formTitle').textContent = 'แก้ไขรายการงบประมาณ (ID: ' + item.id + ')';
+        document.getElementById('btnSave').textContent = 'บันทึกการแก้ไข';
+      }
+
+      // ✅ จัดการฟอร์มบันทึก
+      const budgetForm = document.getElementById('budgetForm');
+      const formMessage = document.getElementById('formMessage');
+      const btnClear = document.getElementById('btnClear');
+
+      budgetForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        if (!isLoggedIn) {
+          alert('กรุณาเข้าสู่ระบบก่อน');
+          return;
+        }
+
+        const data = {
+          id: document.getElementById('budgetId').value || null,
+          fiscalYear: document.getElementById('fiscalYear').value.trim(),
+          budgetType: document.getElementById('budgetType').value.trim(),
+          department: document.getElementById('department').value.trim(),
+          amount: document.getElementById('amount').value.trim(),
+          remark: document.getElementById('remark').value.trim()
+        };
+
+        formMessage.style.display = 'none';
+        formMessage.className = '';
+        formMessage.textContent = '';
+
+        google.script.run
+          .withSuccessHandler(function(res) {
+            if (res && res.success) {
+              formMessage.textContent = res.message || 'บันทึกข้อมูลเรียบร้อย';
+              formMessage.className = 'mt-3 text-center text-success';
+              formMessage.style.display = 'block';
+
+              // เคลียร์ฟอร์มกลับเป็นโหมดเพิ่ม
+              clearForm();
+              // โหลดตารางใหม่
+              loadBudgetTable();
+            } else {
+              formMessage.textContent = (res && res.message) ? res.message : 'ไม่สามารถบันทึกข้อมูลได้';
+              formMessage.className = 'mt-3 text-center text-danger';
+              formMessage.style.display = 'block';
+            }
+          })
+          .withFailureHandler(function(err) {
+            formMessage.textContent = 'เกิดข้อผิดพลาด: ' + err.message;
+            formMessage.className = 'mt-3 text-center text-danger';
+            formMessage.style.display = 'block';
+          })
+          .saveBudget(data);
+      });
+
+      // ✅ ปุ่มล้างฟอร์ม
+      btnClear.addEventListener('click', function() {
+        clearForm();
+      });
+
+      function clearForm() {
+        budgetForm.reset();
+        document.getElementById('budgetId').value = '';
+        document.getElementById('formTitle').textContent = 'เพิ่มรายการงบประมาณ';
+        document.getElementById('btnSave').textContent = 'บันทึก';
+      }
+
+      // ✅ ลบรายการ
+      function deleteBudget(id) {
+        formMessage.style.display = 'none';
+        formMessage.textContent = '';
+
+        google.script.run
+          .withSuccessHandler(function(res) {
+            if (res && res.success) {
+              loadBudgetTable();
+            } else {
+              alert(res && res.message ? res.message : 'ไม่สามารถลบข้อมูลได้');
+            }
+          })
+          .withFailureHandler(function(err) {
+            alert('เกิดข้อผิดพลาด: ' + err.message);
+          })
+          .deleteBudget(id);
+      }
+    </script>
+  </body>
 </html>
